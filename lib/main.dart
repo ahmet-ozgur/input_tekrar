@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:email_validator/email_validator.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,7 +38,143 @@ class MyProject extends StatelessWidget {
         foregroundColor: Colors.white,
         title: Text("Input Tekrar"),
       ),
-      body: TextFieldWidgetKullanimi(),
+      body: TextFormfieldKullanimi(),
+    );
+  }
+}
+
+class TextFormfieldKullanimi extends StatefulWidget {
+  const TextFormfieldKullanimi({super.key});
+
+  @override
+  State<TextFormfieldKullanimi> createState() =>
+      _TextFormfieldKullanimiState();
+}
+
+class _TextFormfieldKullanimiState
+    extends State<TextFormfieldKullanimi> {
+  late final String _email, _password, _userName;
+  final _formKey = GlobalKey<FormState>();
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.all(8),
+        child: Form(
+          key: _formKey,
+          //Validate 3 şekil, buton, kullanıcı etkileşime girdiği an , ya da her zaman
+          //AutoValidateMode
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: Column(
+            children: [
+              //Textediting controllera ihtiyaç duymaz
+              TextFormField(
+                onSaved: (gelenUsername) {
+                  _userName = gelenUsername!;
+                },
+                //Varsayılan değeri tanımlar
+                //initialValue: "ahmetozgur",
+                decoration: InputDecoration(
+                  //hata mesajı renk değişimi
+                  errorStyle: TextStyle(color: Colors.orange),
+                  labelText: "Kullanıcı Adı",
+                  hintText: "Username",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (girilenPass) {
+                  if (girilenPass!.isEmpty) {
+                    return "Kullanıcı Adı boş olamaz.";
+                  }
+                  if (girilenPass.length < 4) {
+                    return "5 karakterden az olamaz";
+                  } else {
+                    return null;
+                  }
+                },
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                onSaved: (gelenEmail) {
+                  _email = gelenEmail!;
+                },
+                //Varsayılan değeri tanımlar
+                //initialValue: "ahmetozgur",
+                decoration: InputDecoration(
+                  //hata mesajı renk değişimi
+                  errorStyle: TextStyle(color: Colors.orange),
+                  labelText: "Email",
+                  hintText: "Email",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (girilenEmail) {
+                  if (!EmailValidator.validate(girilenEmail!)) {
+                    return "Geçerli bir mail giriniz";
+                  } else {
+                    return null;
+                  }
+                },
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                onSaved: (gelenSifre) {
+                  _password = gelenSifre!;
+                },
+                //Varsayılan değeri tanımlar
+                //initialValue: "ahmetozgur",
+                decoration: InputDecoration(
+                  //hata mesajı renk değişimi
+                  errorStyle: TextStyle(color: Colors.orange),
+                  labelText: "Şifre",
+                  hintText: "Password",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (girilenPass) {
+                  if (girilenPass!.isEmpty) {
+                    return "Şifre boş olamaz.";
+                  }
+                  if (girilenPass.length < 6) {
+                    return "5 karakterden az olamaz";
+                  } else {
+                    return null;
+                  }
+                },
+              ),
+              SizedBox(height: 10),
+              SizedBox(
+                width: 180,
+                height: 55,
+                child: ElevatedButton(
+                  onPressed: () {
+                    //validate tamamnlandı mı kontrol etmek için
+                    bool _isValidate = _formKey.currentState!
+                        .validate();
+                    if (_isValidate) {
+                      //TFFden gelen verileri kaydetme işlemi
+                      _formKey.currentState!.save();
+                      String result =
+                          "username:$_userName\nemail:$_email\npassword:$_password";
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text(result)));
+                      //Save işlemi olduktan sonra textleri temizlemek için
+                      _formKey.currentState!.reset();
+                    }
+                  },
+                  child: Text("Onayla"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade400,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadiusGeometry.circular(10),
+                      side: BorderSide(color: Colors.green, width: 3),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
